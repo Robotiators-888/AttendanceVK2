@@ -8,3 +8,5 @@ LOG_PATH = "C:/Users/timmy/PycharmProjects/AttendanceVK2/pages/data/log.txt"
 REALTIME_UPDATE_PATH = "C:/Users/timmy/PycharmProjects/AttendanceVK2/pages/data/realtime.pickle"
 ADMIN_PW = pbkdf2_sha256.hash("hello")
 SECRET_PATH = "C:/Users/timmy/PycharmProjects/AttendanceVK2/pages/data/client_secrets.json"
+TOP_N = 5
+GOAL = 888

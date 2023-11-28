@@ -1,4 +1,4 @@
-from pages.utils.CONFIG import WEEKLY_PATH, DAILY_PATH, PIN_PATH, LAST_UPDATE_PATH, LOGGED_IN_PATH, LOG_PATH
+from pages.utils.CONFIG import WEEKLY_PATH, DAILY_PATH, PIN_PATH, LAST_UPDATE_PATH, LOGGED_IN_PATH, LOG_PATH, TOP_N
 import json
 import pandas as pd
 import os
@@ -183,14 +183,26 @@ def calculate_metrics():
         weekly_metrics["current_week"] = 0
         weekly_metrics["last_week"] = 0
         weekly_metrics["total"] = 0
+        weekly_metrics["max"] = 0
+        weekly_metrics["last_max"] = 0
+        weekly_metrics["average"] = 0
+        weekly_metrics["last_average"] = 0
     elif len(df.columns) <= 3:
         weekly_metrics["current_week"] = df[df.columns[-1]].sum()
         weekly_metrics["last_week"] = 0
         weekly_metrics["total"] = df[df.columns[2:]].select_dtypes(include='number').sum().sum()
+        weekly_metrics["max"] = max(list(df[df.columns[-1]]))
+        weekly_metrics["last_max"] = 0
+        weekly_metrics["average"] = weekly_metrics["current_week"]/(len(df)-1) # -1 because of filler
+        weekly_metrics["last_average"] = 0
     else:
         weekly_metrics["current_week"] = df[df.columns[-1]].sum()
         weekly_metrics["last_week"] = df[df.columns[-2]].sum()
         weekly_metrics["total"] = df[df.columns[2:]].select_dtypes(include='number').sum().sum()
+        weekly_metrics["max"] = max(list(df[df.columns[-1]]))
+        weekly_metrics["last_max"] = max(list(df[df.columns[-2]]))
+        weekly_metrics["average"] = weekly_metrics["current_week"]/(len(df)-1)  # -1 because of filler
+        weekly_metrics["last_average"] = weekly_metrics["last_week"] / (len(df) - 1)  # -1 because of filler
 
     daily_metrics = {}
     df = avoid_block_pandas_read(DAILY_PATH)
@@ -214,8 +226,8 @@ def get_leaderboard():
         time = None
     else:
         df["total_hours"] = df[df.columns[2:]].sum(axis=1)
-        leaderboard = list(df.nlargest(5, 'total_hours')["name"])
-        time = [int(i) for i in list(df.nlargest(5, 'total_hours')["total_hours"])]
+        leaderboard = list(df.nlargest(TOP_N, 'total_hours')["name"])
+        time = [int(i) for i in list(df.nlargest(TOP_N, 'total_hours')["total_hours"])]
     return leaderboard, time
 
 

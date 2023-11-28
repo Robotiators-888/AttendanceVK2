@@ -1,9 +1,12 @@
 import json
-
 import streamlit as st
 from pages.utils.CONFIG import ADMIN_PW, WEEKLY_PATH, DAILY_PATH, LOGGED_IN_PATH, PIN_PATH
 from passlib.hash import pbkdf2_sha256
 from pages.utils.helpers import avoid_block_pandas_read, avoid_block_read, upload_data
+from streamlit_autorefresh import st_autorefresh
+
+# Require admin password every 5 minutes
+st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 
 st.title("Admin Page")
 
@@ -39,6 +42,9 @@ if not check_password():
 
 with st.form("upload_form"):
     st.subheader("Upload Data to Cloud")
+
+
+
     share_with = st.text_input("Share with Who? Format it in a list form: me@gmail.com,you@yahoo.com,him@gmail.com")
     submit_btn = st.form_submit_button("Upload Data")
 
@@ -49,6 +55,16 @@ with st.form("upload_form"):
             st.success("Data sucessfully uploaded!")
         except Exception as e:
             st.error(e)
+
+# TODO Finish PIN reset
+# with st.form("pin_reset_form"):
+#     st.subheader("Reset a PIN")
+#     current = st.text_input("Current PIN")
+#     new = st.text_input("New PIN")
+#     submit_btn = st.form_submit_button("Reset")
+#
+#     if submit_btn:
+#         pass
 
 with st.expander("Raw CSV data"):
     st.subheader("Weekly Raw Data")
